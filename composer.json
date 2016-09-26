@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Ifp\\": "src/Ifp/"
+        }
+    },
+    "config": {
+        "disable-tls": true
+    }
+}

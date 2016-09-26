@@ -1,6 +1,6 @@
 <?php
 $config = [
-    'db' = [
+    'db' => [
         'dbhost' => 'bagend',
         'dbuser' => 'root',
         'dbpass' => 'mysql',
