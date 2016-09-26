@@ -1,12 +1,25 @@
 <?php
-namespace Ifp\VAgent\Source;
+namespace Ifp\VAgent\Adapter\Source;
 
-abstract class SourceAdapaterAbstract implements SourceAdapaterInterface
+abstract class SourceAdapterAbstract implements SourceAdapterInterface
 {
+    /**
+     * @var int
+     */
     protected $cursor;
+
+    /**
+     * @var int
+     */
+    protected $page;
 
     public function __construct()
     {
-        init();
+        $this->init();
+    }
+
+    public function init()
+    {
+        $this->cursor = null;
     }
 }

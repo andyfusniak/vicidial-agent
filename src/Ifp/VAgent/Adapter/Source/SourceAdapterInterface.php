@@ -1,5 +1,5 @@
 <?php
-namespace Ifp\VAgent\Source;
+namespace Ifp\VAgent\Adapter\Source;
 
 interface SourceAdapterInterface
 {
@@ -19,7 +19,7 @@ interface SourceAdapterInterface
     public function getCursorPosition();
 
     /**
-     * @return Items
+     * @return ItemCollection
      */
     public function getAllItems();
 
@@ -29,12 +29,12 @@ interface SourceAdapterInterface
     public function getNextItem();
 
     /**
-     * @return Items
+     * @return ItemCollection
      */
     public function getNextPage();
 
     /**
-     * @param int $batchSize maximum number of items to pull per page
+     * @param int $size maximum number of items to pull per page
      */
     public function setPageSize($size);
 }

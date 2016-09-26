@@ -2,8 +2,8 @@
 namespace Ifp\VAgent\Mapper;
 
 use Ifp\VAgent\Mapper\MapperInterface;
-use Ifp\VAgent\Source\SourceAdapterInterface as SourceAdapter;
-use Ifp\VAgent\Dest\DestAdapterInterface as DestAdapter;
+use Ifp\VAgent\Adapter\Source\SourceAdapterInterface as SourceAdapter;
+use Ifp\VAgent\Adapter\Dest\DestAdapterInterface as DestAdapter;
 
 class Mapper implements MapperInterface
 {
@@ -15,7 +15,7 @@ class Mapper implements MapperInterface
     /**
      * @bar DestAdapaterInterface
      */
-    protecte $destAdapater;
+    protected $destAdapater;
 
     public function __construct(SourceAdapter $sourceAdapter, DestAdapter $destAdapater)
     {
@@ -25,12 +25,11 @@ class Mapper implements MapperInterface
 
     public function process()
     {
-        $numSourceItems = $sourceAdapter->countTotalItems();
-
-        while ($sourceAdapter->getNextItem()) {
-            var_dump($sourceAdapter);
+        $numSourceItems = $this->sourceAdapter->countTotalItems();
+        
+        while ($item = $this->sourceAdapter->getNextItem()) {
+            $this->destAdapater->pushItem($item);
         }
-
 
     }
 }

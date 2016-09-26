@@ -32,23 +32,23 @@ class Item
      *
      * @return Item
      */
-    public static factory(array $options)
+    public static function factory(array $options)
     {
         $item = new Item();
 
-        if (isset($options) && (isset[$options['id']])) {
-            $item->setFirstname($options['id']);
+        if (isset($options) && (isset($options['id']))) {
+            $item->setId($options['id']);
         }
 
-        if (isset($options) && (isset[$options['telephone']])) {
-            $item->setFirstname($options['telephone']);
+        if (isset($options) && (isset($options['telephone']))) {
+            $item->setTelephone($options['telephone']);
         }
 
-        if (isset($options) && (isset[$options['firstname']])) {
+        if (isset($options) && (isset($options['firstname']))) {
             $item->setFirstname($options['firstname']);
         }
 
-        if (isset($options) && (isset[$options['lastname']])) {
+        if (isset($options) && (isset($options['lastname']))) {
             $item->setLastname($options['lastname']);
         }
 
