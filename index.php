@@ -10,6 +10,7 @@ use Ifp\Vicidial\VicidialApiGateway;
 
 // open a test connection
 $sourceConfig360 = [
+    'name' => '360',
     'db' => [
         'dbhost' => '27.254.36.66',
         'dbuser' => '360user',
@@ -33,6 +34,7 @@ $sourceConfig360 = [
         'custom_fields' => 'Y'
     ]
 ];
+
 
 try {
     $pdo = new PDO(
