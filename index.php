@@ -26,10 +26,11 @@ $sourceConfig360 = [
         'name'         => 'first_name'
     ],
     'static_fields' => [
-        VicidialApiGateway::REQUIRED_PARAM_LIST_ID    => 'robot',
+        VicidialApiGateway::REQUIRED_PARAM_LIST_ID    => '30000',
         VicidialApiGateway::REQUIRED_PARAM_PHONE_CODE => '66',
-        'last_name' => 'not provided',
-        'source'    => '360'
+        'last_name'     => 'not provided',
+        'source'        => '360',
+        'custom_fields' => 'Y'
     ]
 ];
 
