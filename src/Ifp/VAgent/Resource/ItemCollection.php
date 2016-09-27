@@ -39,7 +39,7 @@ class ItemCollection implements \Iterator, \Countable
 
     public function current()
     {
-        return $this->items[$this->cursor];
+        return isset($this->items[$this->cursor]) ? $this->items[$this->cursor] : null;
     }
 
     public function key()

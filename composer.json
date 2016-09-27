@@ -1,18 +1,9 @@
 {
     "autoload": {
         "psr-4": {
+            "Ifp\\Vicidial\\": "../vicidial-api-gateway/src/Ifp/Vicidial",
             "Ifp\\": "src/Ifp/"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://bitbucket.org/sudtanadevteam/vicidial-api-gateway"
-        }
-    ],
-    "require": {
-        "ifp/vicidial-api-gateway": "dev-master"
-   
     },
     "config": {
         "disable-tls": false

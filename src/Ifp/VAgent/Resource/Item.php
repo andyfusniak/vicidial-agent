@@ -11,17 +11,22 @@ class Item
     /**
      * @var string
      */
-    private $telephone;
+    private $phoneNumber;
 
     /**
      * @var string
      */
-    private $firstname;
+    private $firstName;
 
     /**
-     * @var lastname
+     * @var string
      */
-    private $lastname;
+    private $lastName;
+
+    /**
+     * @var array
+     */
+    private $customParams;
     
     public function __construct()
     {
@@ -40,16 +45,16 @@ class Item
             $item->setId($options['id']);
         }
 
-        if (isset($options) && (isset($options['telephone']))) {
-            $item->setTelephone($options['telephone']);
+        if (isset($options) && (isset($options['phone_number']))) {
+            $item->setTelephone($options['phone_number']);
         }
 
-        if (isset($options) && (isset($options['firstname']))) {
-            $item->setFirstname($options['firstname']);
+        if (isset($options) && (isset($options['first_number']))) {
+            $item->setFirstname($options['first_name']);
         }
 
-        if (isset($options) && (isset($options['lastname']))) {
-            $item->setLastname($options['lastname']);
+        if (isset($options) && (isset($options['last_name']))) {
+            $item->setLastname($options['last_name']);
         }
 
         return $item;
@@ -76,35 +81,35 @@ class Item
     }
 
     /**
-     * Set the call telephone number for this item
+     * Set the call phone number for this item
      *
-     * @param string $telephone call telephone number for this item
+     * @param string $phoneNumber call phone number for this item
      * @return Item
      */
-    public function setTelephone($telephone)
+    public function setPhoneNumber($phoneNumber)
     {
-        $this->telephone = $telephone;
+        $this->phoneNumber = $phoneNumber;
         return $this;
     }
 
     /**
-     * Get the telephone number for this item
+     * Get the phone number for this item
      *
-     * @return string telephone number
+     * @return string phone number
      */
-    public function getTelephone()
+    public function getPhoneNumber()
     {
-        return $this->telephone;
+        return $this->phoneNumber;
     }
 
     /**
      * Set the first name
-     * @param string $firstname
+     * @param string $firstName
      * @return Item
      */
-    public function setFirstname($firstname)
+    public function setFirstName($firstName)
     {
-        $this->firstname = (string) $firstname;
+        $this->firstName = (string) $firstName;
         return $this;
     }
 
@@ -112,19 +117,19 @@ class Item
      * Get the first name
      * @return string first name
      */
-    public function getFirstname()
+    public function getFirstName()
     {
-        return $this->firstname;
+        return $this->firstName;
     }
 
    /**
      * Set the last name
-     * @param string $lastname
+     * @param string $lastName
      * @return Item
      */
-    public function setLastname($lastname)
+    public function setLastName($lastName)
     {
-        $this->lastname = (string) $lastname;
+        $this->lastName = (string) $lastName;
         return $this;
     }
 
@@ -132,8 +137,24 @@ class Item
      * Get the last name
      * @return string last name
      */
-    public function getLastname()
+    public function getLastName()
     {
-        return $this->lastname;
+        return $this->lastName;
+    }
+
+    /**
+     * Get an associative array of custom parameters
+     *
+     * @return array associative array of custom parameters
+     */
+    public function getCustomParams()
+    {
+        return $this->customParams;
+    }
+
+    public function setCustomParams(array $params)
+    {
+        $this->customParams = $params;
+        return $this;
     }
 }
