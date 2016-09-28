@@ -1,7 +1,7 @@
 <?php
 $config = [
     'db' => [
-        'dbhost' => 'bagend',
+        'dbhost' => 'localhost',
         'dbuser' => 'root',
         'dbpass' => 'mysql',
         'dbname' => 'vagent'
