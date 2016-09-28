@@ -2,34 +2,48 @@
 namespace Ifp\VAgent\Mapper;
 
 use Ifp\VAgent\Mapper\MapperInterface;
+use Ifp\VAgent\Db\DbSync;
 use Ifp\VAgent\Adapter\Source\SourceAdapterInterface as SourceAdapter;
 use Ifp\VAgent\Adapter\Dest\DestAdapterInterface as DestAdapter;
 
 class Mapper implements MapperInterface
 {
     /**
+     * @var DbSync
+     */
+    protected $dbSync;
+
+    /**
      * @var SourceAdapaterInterface
      */
     protected $sourceAdapter;
 
     /**
-     * @bar DestAdapaterInterface
+     * @var DestAdapaterInterface
      */
     protected $destAdapater;
 
-    public function __construct(SourceAdapter $sourceAdapter, DestAdapter $destAdapater)
+    public function __construct(DbSync $dbSync,
+                                SourceAdapter $sourceAdapter,
+                                DestAdapter $destAdapater)
     {
+        $this->dbSync = $dbSync;
         $this->sourceAdapter = $sourceAdapter;
         $this->destAdapater = $destAdapater;
     }
 
     public function process()
     {
-        $numSourceItems = $this->sourceAdapter->countTotalItems();
-        
+        $dataSourceId = $this->dbSync->getDataSourceIdByName('360');
+
+        $this->dbSync->updateSourceStats(
+            $dataSourceId,
+            $this->sourceAdapter->countTotalItems(),
+            $this->sourceAdapter->getLastRecordId()
+        );
+
         while ($item = $this->sourceAdapter->getNextItem()) {
             $this->destAdapater->pushItem($item);
         }
-
     }
 }

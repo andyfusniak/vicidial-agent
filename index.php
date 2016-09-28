@@ -5,6 +5,7 @@ require_once './vendor/autoload.php';
 use Ifp\VAgent\Adapter\Source;
 use Ifp\VAgent\Adapter\Dest\VicidialDestAdapter;
 use Ifp\VAgent\Mapper\Mapper;
+use Ifp\VAgent\Db\DbSync;
 
 use Ifp\Vicidial\VicidialApiGateway;
 
@@ -36,20 +37,21 @@ $sourceConfig360 = [
 ];
 
 
+// Source PDO
 try {
-    $pdo = new PDO(
+    $sourcePdo = new PDO(
         'mysql:host=' . $sourceConfig360['db']['dbhost']
                       . ';dbname=' . $sourceConfig360['db']['dbname'] . ';charset=UTF8',
         $sourceConfig360['db']['dbuser'],
         $sourceConfig360['db']['dbpass']
     );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sourcePdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     var_dump($e->getMessage());
 }
 
 //$mock = new Source\MockSourceAdapter();
-$source = new Source\MysqlSourceAdapter($pdo, $sourceConfig360);
+$source = new Source\MysqlSourceAdapter($sourcePdo, $sourceConfig360);
 
 $apiGateway = new VicidialApiGateway();
 $apiGateway->setConnectionTimeoutSeconds($config['apigateway']['timeout'])
@@ -59,5 +61,23 @@ $apiGateway->setConnectionTimeoutSeconds($config['apigateway']['timeout'])
 
 $dest = new VicidialDestAdapter($apiGateway);
 
-$mapper = new Mapper($source, $dest);
+// VAgent PDO and DbSync Object
+try {
+    $pdo = new PDO(
+        'mysql:host=' . $config['db']['dbhost']
+                      . ';dbname=' . $config['db']['dbname'] . ';charset=UTF8',
+        $config['db']['dbuser'],
+        $config['db']['dbpass']
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dbSync = new DbSync($pdo);
+} catch (PDOException $e) {
+    var_dump($e->getMessage());
+}
+
+$mapper = new Mapper($dbSync, $source, $dest);
 $mapper->process();
+
+// disconnect from databases
+$sourcePdo = null;
+$dbSync->disconnect();

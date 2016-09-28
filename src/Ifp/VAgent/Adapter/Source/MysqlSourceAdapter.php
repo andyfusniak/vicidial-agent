@@ -91,6 +91,24 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
         return (int) $row['cnt'];
     }
+
+    /**
+     * Get the last row insert from the datasource
+     *
+     * @return int the last record insert
+     */
+    public function getLastRecordId()
+    {
+        $statement = $this->pdo->prepare('
+            SELECT AUTO_INCREMENT AS next_record_id
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = "' . $this->getTableName() . '"'
+        );
+        $statement->execute();
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        return (int) $row['next_record_id'] - 1;
+    }
     
     /**
      * @return int current cursor position in the list
@@ -176,6 +194,9 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     }
 
     /**
+     * Items are pulled in FIFO order i.e. descending id
+     * to ensure the most recent leads are acted on first
+     *
      * @return Item
      */
     public function getNextItem()
@@ -183,9 +204,11 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         $statement = $this->pdo->prepare(
             'SELECT ' . $this->getSelectFieldsSqlString()
             . ' FROM ' . $this->getTableName()
+            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' DESC'
             . ' LIMIT ' . $this->getCursorPosition() . ',1'
         );
         $statement->execute();
+
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
         $dest = $this->sourceDestMapping($row);
         $this->cursor++;

@@ -27,14 +27,14 @@ class DbSync
     public function getDataSourceIdByName(string $name)
     {
         $statement = $this->pdo->prepare('
-            SELECT `id`
+            SELECT `data_source_id`
             FROM `data_sources`
             WHERE `name` = :name
         ');
         $statement->bindValue(':name', (string) $name, \PDO::PARAM_INT);
         $statement->execute();
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
-        return $row['id'];
+        return $row['data_source_id'];
     }
 
     public function addDataSync($params)
@@ -101,5 +101,38 @@ class DbSync
             \PDO::PARAM_STR
         );
         $statement->execute();
+    }
+
+    /**
+     * Update the source stats
+     *
+     * @param int $sourceCountTotal
+     * @param int $sourceLastRecord
+     */
+    public function updateSourceStats($dataSourceId,
+                                      $sourceCountTotal,
+                                      $sourceLastRecord)
+    {
+        $statement = $this->pdo->prepare('
+            UPDATE `data_sources`
+            SET source_count_total = :source_count_total,
+                source_last_record = :source_last_record
+        ');
+        $statement->bindValue(
+            ':source_count_total',
+            (int) $sourceCountTotal,
+            \PDO::PARAM_INT
+        );
+        $statement->bindValue(
+            ':source_last_record',
+            (int) $sourceLastRecord,
+            \PDO::PARAM_INT
+        );
+        $statement->execute();
+    }
+
+    public function disconnect()
+    {
+        $this->pdo = null;
     }
 }
