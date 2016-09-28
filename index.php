@@ -10,6 +10,7 @@ use Ifp\Vicidial\VicidialApiGateway;
 
 // open a test connection
 $sourceConfig360 = [
+    'name' => '360',
     'db' => [
         'dbhost' => '27.254.36.66',
         'dbuser' => '360user',
@@ -28,16 +29,17 @@ $sourceConfig360 = [
     'static_fields' => [
         VicidialApiGateway::REQUIRED_PARAM_LIST_ID    => '30000',
         VicidialApiGateway::REQUIRED_PARAM_PHONE_CODE => '66',
-        'last_name'     => 'not provided',
+        'last_name'     => '',
         'source'        => '360',
         'custom_fields' => 'Y'
     ]
 ];
 
+
 try {
     $pdo = new PDO(
         'mysql:host=' . $sourceConfig360['db']['dbhost']
-                      . ';dbname=' . $sourceConfig360['db']['dbname'],
+                      . ';dbname=' . $sourceConfig360['db']['dbname'] . ';charset=UTF8',
         $sourceConfig360['db']['dbuser'],
         $sourceConfig360['db']['dbpass']
     );
