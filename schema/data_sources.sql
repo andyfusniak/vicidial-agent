@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `data_sources` (
   `source_last_record` INT(10) UNSIGNED NULL DEFAULT NULL,
   `cursor` INT(10) UNSIGNED NULL DEFAULT NULL,
   `sync_success_total` INT(10) UNSIGNED NULL DEFAULT NULL,
-  `sync_error_total` INT
+  `sync_error_total` INT(10) UNSIGNED NULL DEFAULT NULL,
   `last_sync` TIMESTAMP NULL DEFAULT NULL,
   `created` TIMESTAMP NULL DEFAULT NULL,
   `modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
