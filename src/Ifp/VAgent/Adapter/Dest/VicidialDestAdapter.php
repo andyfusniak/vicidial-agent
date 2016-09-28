@@ -44,6 +44,8 @@ class VicidialDestAdapter implements DestAdapterInterface
         var_dump($this->vicidialApiGateway->getHttpQueryUri());
         $result = $this->vicidialApiGateway->apiCall();
         var_dump($this->vicidialApiGateway->getApiResponseMessage());
+
+        return $result;
     }
     
     /**

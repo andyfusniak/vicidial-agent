@@ -43,7 +43,27 @@ class Mapper implements MapperInterface
         );
 
         while ($item = $this->sourceAdapter->getNextItem()) {
-            $this->destAdapater->pushItem($item);
+
+            if (DbSync::DATA_SYNC_SUCCESS === $this->dbSync->getSyncStatus($dataSourceId, $item->getId())) {
+                // already synced so skip
+                var_dump("Skipping dataSourceId=" . $dataSourceId . ", id=" . $item->getId());
+                continue;
+            }
+
+            $result = $this->destAdapater->pushItem($item);
+            if (true === $result) {
+                $this->dbSync->markDataSync(
+                    $dataSourceId,
+                    $item->getId(),
+                    DbSync::DATA_SYNC_SUCCESS
+                );
+            } else {
+                $this->dbSync->markDataSync(
+                    $dataSourceId,
+                    $item->getId(),
+                    DbSync::DATA_SYNC_ERROR
+                );
+            }
         }
     }
 }
