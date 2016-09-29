@@ -3,6 +3,7 @@ namespace Ifp\VAgent\Adapter\Dest;
 
 use Ifp\VAgent\Resource\Item;
 use Ifp\Vicidial\VicidialApiGateway;
+use Monolog\Logger;
 
 class VicidialDestAdapter implements DestAdapterInterface
 {
@@ -10,6 +11,11 @@ class VicidialDestAdapter implements DestAdapterInterface
      * @var VicidialApiGateway
      */
     protected $vicidialApiGateway;
+
+    /**
+     * @var Logger
+     */
+    protected $log;
 
     /**
      * @param VicidialApiGateway $vicidialApiGateway instance
@@ -40,11 +46,15 @@ class VicidialDestAdapter implements DestAdapterInterface
             $this->vicidialApiGateway->addParam($name, $value);
         }
 
-        var_dump('Pushing to VicidialApiGateway');
-        var_dump($this->vicidialApiGateway->getHttpQueryUri());
+        if ($this->log) {
+            $this->log->debug('Calling VicidialApiGateway');
+            $this->log->debug('API URI ', [$this->vicidialApiGateway->getHttpQueryUri()]);
+        }
         $result = $this->vicidialApiGateway->apiCall();
-        var_dump($this->vicidialApiGateway->getApiResponseMessage());
-
+        
+        if ($this->log) {
+            $this->log->debug('Response: ', [$this->vicidialApiGateway->getApiResponseMessage()]);
+        }
         return $result;
     }
     
@@ -56,5 +66,17 @@ class VicidialDestAdapter implements DestAdapterInterface
     public function getItem(string $id)
     {
         return new Item();
+    }
+
+    /**
+     * Inject the Logger dependency (optional)
+     *
+     * @param Logger
+     * @return VicidialDestAdapter
+     */
+    public function setLogger($logger)
+    {
+        $this->log = $logger;
+        return $this;
     }
 }

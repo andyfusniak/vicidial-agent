@@ -34,7 +34,8 @@ interface SourceAdapterInterface
     public function getNextPage();
 
     /**
-     * @param int $size maximum number of items to pull per page
+     * @param int $pageSize maximum number of items to pull per page
+     * @return SourceAdapterInterface
      */
-    public function setPageSize($size);
+    public function setPageSize($pageSize);
 }

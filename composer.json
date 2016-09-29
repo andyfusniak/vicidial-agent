@@ -1,4 +1,7 @@
 {
+    "require": {
+        "monolog/monolog": "*"
+    },
     "autoload": {
         "psr-4": {
             "Ifp\\Vicidial\\": "../vicidial-api-gateway/src/Ifp/Vicidial",
