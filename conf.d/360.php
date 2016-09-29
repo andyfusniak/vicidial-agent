@@ -15,14 +15,23 @@ return [
         // source to dest
         'phone_number' => 'phone_number',
         'source'       => 'source',
-        'age'          => 'shoe_size',
-        'name'         => 'first_name'
+        'age'          => 'age',
+        'name'         => 'first_name',
+        'content'      => 'Content',
+        'medium'       => 'Medium',
+        'term'         => 'Term',
+        'date_added'   => 'Date_Added',
+        'page'         => 'Page',
+        'campaign'     => 'Campaign',
+        'weight'       => 'Weight',
+        'height'       => 'Height',
+        'problem'      => 'Problem',
+        'email'        => 'Email'
     ],
     'static_fields' => [
-        'list_id'       => '30000',
+        'list_id'       => '1001',
         'phone_code'    => '66',
         'last_name'     => '',
-        'source'        => '360',
         'custom_fields' => 'Y'
     ]
 ];
