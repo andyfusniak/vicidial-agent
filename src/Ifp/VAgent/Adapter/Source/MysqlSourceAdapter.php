@@ -1,7 +1,9 @@
 <?php
 namespace Ifp\VAgent\Adapter\Source;
 
+use Monolog\Logger;
 use Ifp\VAgent\Resource\Item;
+use Ifp\VAgent\Resource\ItemCollection;
 
 class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterInterface
 {
@@ -15,6 +17,10 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
      */
     protected $config;
 
+    /**
+     * @var Logger
+     */
+    protected $log;
 
     /**
      * Function constructor
@@ -216,16 +222,45 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     }
 
     /**
-     * @return Items
+     * Get the next page of Item objects as a ItemCollection
+     *
+     * @return ItemCollection
      */
     public function getNextPage()
     {
+        $page = ($this->page * $this->pageSize);
+
+        $statement = $this->pdo->prepare(
+            'SELECT ' . $this->getSelectFieldsSqlString()
+            . ' FROM ' . $this->getTableName()
+            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' DESC'
+            . ' LIMIT ' . $page . ',' . $this->pageSize
+        );
+        $statement->execute();
+        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+    
+        if ($this->log) {
+            $this->log->debug('Fetched page the next ' . $this->pageSize . ' from page ' . $page);
+        }    
+
+        $itemCollection = new ItemCollection();
+        foreach ($rows as $row) {
+            $dest = $this->sourceDestMapping($row);
+            $itemCollection->add($this->buildItemFromDestMap($dest));
+        }
+        $this->page++;
+        return $itemCollection;
     }
 
     /**
-     * @param int $batchSize maximum number of items to pull per page
+     * Inject the Logger dependency (optional)
+     *
+     * @param Logger
+     * @return VicidialDestAdapter
      */
-    public function setPageSize($size)
+    public function setLogger($logger)
     {
+        $this->log = $logger;
+        return $this;
     }
 }

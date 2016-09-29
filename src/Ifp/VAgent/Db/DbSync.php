@@ -1,6 +1,8 @@
 <?php
 namespace Ifp\VAgent\Db;
 
+use Monolog\Logger;
+
 class DbSync
 {
     const DATA_SYNC_SUCCESS = 'success';
@@ -20,6 +22,16 @@ class DbSync
     {
         $this->pdo = $pdo;
     }
+
+    /**
+     * @var associtive array of sync list
+     */
+    protected $syncCache;
+
+    /**
+     * @var Logger
+     */
+    protected $log;
 
     /**
      * Get the MySQL data source primary key by name
@@ -95,13 +107,69 @@ class DbSync
         $statement->execute();
     }
 
-    public function getSyncStatus($sourceId, $id)
+    private function loadSyncCache($sourceId)
     {
+        if ($this->log) {
+            $this->log->debug('Loading sync cache');
+        }
+
+        $statement = $this->pdo->prepare('
+            SELECT `id`, `status`
+            FROM `data_sync`
+            WHERE `source_id` = :source_id
+        ');
+        $statement->bindValue(
+            ':source_id',
+            $sourceId,
+            \PDO::PARAM_INT
+        );
+        $statement->execute();
+        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        // todo: convert $row['status'] to boolean to save memory
+        foreach ($rows as $row) {
+            $this->syncCache[$sourceId][$row['id']] = $row['status'];
+        }
+
+        if ($this->log) {
+            $this->log->debug('Sync cache loaded for source id '
+                . $sourceId);
+        }
+    }
+
+    /**
+     * Check if item $id for datasource $sourceId has been processed
+     *
+     * @param int $sourceId
+     * @param string $id
+     * @param bool $useCache if true used the cached values
+     */
+    public function getSyncStatus($sourceId, $id, $useCache = true)
+    {
+        if (true === $useCache) {
+            if (null === $this->syncCache) {
+                $this->loadSyncCache($sourceId);
+            }
+            if (array_key_exists($id, $this->syncCache[$sourceId])) {
+                if ($this->log) {
+                    $this->log->debug(
+                        'Cache hit for source id '
+                        . $sourceId
+                        . ' for id '
+                        . $id
+                        . ' value '
+                        . $this->syncCache[$sourceId][$id]);
+                }
+                return $this->syncCache[$sourceId][$id];
+            }
+            return null;
+        }
+
         $statement = $this->pdo->prepare('
             SELECT `status`
             FROM `data_sync`
-            WHERE source_id = :source_id
-              AND id = :id
+            WHERE `source_id` = :source_id
+              AND `id` = :id
         ');
         $statement->bindValue(
             ':source_id',
@@ -293,5 +361,17 @@ class DbSync
     public function disconnect()
     {
         $this->pdo = null;
+    }
+
+    /**
+     * Inject the Logger dependency (optional)
+     *
+     * @param Logger
+     * @return VicidialDestAdapter
+     */
+    public function setLogger($logger)
+    {
+        $this->log = $logger;
+        return $this;
     }
 }

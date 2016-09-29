@@ -1,6 +1,8 @@
 <?php
-require_once './config.php';
 require_once './vendor/autoload.php';
+
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 use Ifp\VAgent\Adapter\Source;
 use Ifp\VAgent\Adapter\Dest\VicidialDestAdapter;
@@ -9,35 +11,37 @@ use Ifp\VAgent\Db\DbSync;
 
 use Ifp\Vicidial\VicidialApiGateway;
 
-// open a test connection
-$sourceConfig360 = [
-    'name' => '360',
-    'db' => [
-        'dbhost' => '27.254.36.66',
-        'dbuser' => '360user',
-        'dbpass' => 'Pe2n!*8f',
-        'dbname' => 'gt360'
-    ],
-    'table_name' => 'users',
-    'primary_key_field_name' => 'id',
-    'select_field_mappings' => [
-        // source to dest
-        'phone_number' => 'phone_number',
-        'source'       => 'source',
-        'age'          => 'shoe_size',
-        'name'         => 'first_name'
-    ],
-    'static_fields' => [
-        VicidialApiGateway::REQUIRED_PARAM_LIST_ID    => '30000',
-        VicidialApiGateway::REQUIRED_PARAM_PHONE_CODE => '66',
-        'last_name'     => '',
-        'source'        => '360',
-        'custom_fields' => 'Y'
-    ]
-];
+$config = require_once './config.php';
 
+// change to the project root dir
+chdir(__DIR__);
+
+
+// setup the logging
+$log = new Logger('vagent');
+$log->pushHandler(new StreamHandler($config['log_fullpath'], $config['logging_level']));
+$log->info('VAgent Started');
+
+// read each of the config files from the conf.d directory
+// and add each to the source configuration array
+$sourceConfig = [];
+$glob = glob($config['config_data_dir'] . '/*.php');
+$log->debug('Globbing directory "' . $config['config_data_dir']
+    . '" found ' . count($glob) . ' file(s)');
+foreach ($glob as $filepath) {
+    $filename = basename($filepath, '.php');
+    $sourceConfig[$filename] = include $filepath;
+    $log->debug('Read config file "' . $filepath
+        . '" into $sourceConfig[\'' . $filename . '\']');
+}
+
+
+// hard wired for a single source (refactor later)
+$sourceConfig360 = $sourceConfig['360'];
 
 // Source PDO
+$log->info('Attempting to connect to source db defined by '
+    . $sourceConfig360['name'] . '...');
 try {
     $sourcePdo = new PDO(
         'mysql:host=' . $sourceConfig360['db']['dbhost']
@@ -46,12 +50,14 @@ try {
         $sourceConfig360['db']['dbpass']
     );
     $sourcePdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $log->info('Connection Established');
 } catch (PDOException $e) {
-    var_dump($e->getMessage());
+    throw $e;
 }
 
 //$mock = new Source\MockSourceAdapter();
 $source = new Source\MysqlSourceAdapter($sourcePdo, $sourceConfig360);
+$source->setLogger($log);
 
 $apiGateway = new VicidialApiGateway();
 $apiGateway->setConnectionTimeoutSeconds($config['apigateway']['timeout'])
@@ -60,6 +66,7 @@ $apiGateway->setConnectionTimeoutSeconds($config['apigateway']['timeout'])
            ->setPass($config['apigateway']['pass']);
 
 $dest = new VicidialDestAdapter($apiGateway);
+$dest->setLogger($log);
 
 // VAgent PDO and DbSync Object
 try {
@@ -71,13 +78,19 @@ try {
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $dbSync = new DbSync($pdo);
+    $dbSync->setLogger($log);
 } catch (PDOException $e) {
     var_dump($e->getMessage());
 }
 
-$mapper = new Mapper($dbSync, $source, $dest);
+$mapper = new Mapper($dbSync, $source, $dest, ['skip_errors' => true]);
+$mapper->setLogger($log);
 $mapper->process();
 
 // disconnect from databases
+$log->info('Disconnecting from database');
 $sourcePdo = null;
 $dbSync->disconnect();
+
+
+$log->info('VAgent Ending');
