@@ -40,9 +40,14 @@ class VicidialDestAdapter implements DestAdapterInterface
             'first_name', $item->getFirstName()
         )->addParam(
             'last_name', $item->getLastName()
+        )->addParam(
+            'id', $item->getId()
         );
 
         foreach ($item->getCustomParams() as $name => $value) {
+            if (null === $value) {
+                $value = '';
+            }
             $this->vicidialApiGateway->addParam($name, $value);
         }
 
