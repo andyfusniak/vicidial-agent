@@ -149,7 +149,10 @@ class DbSync
         if (true === $useCache) {
             if (null === $this->syncCache) {
                 $this->loadSyncCache($sourceId);
+            } else if (!isset($this->syncCache[$sourceId])) {
+                $this->loadSyncCache($sourceId);
             }
+
             if (array_key_exists($id, $this->syncCache[$sourceId])) {
                 if ($this->log) {
                     $this->log->debug(
