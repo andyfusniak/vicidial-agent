@@ -49,7 +49,10 @@ class DbSync
         $statement->bindValue(':name', (string) $name, \PDO::PARAM_INT);
         $statement->execute();
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
-        return $row['data_source_id'];
+        if ($row) {
+            return $row['data_source_id'];
+        }
+        return null;
     }
 
     public function addDataSync($sourceId, $id, $status)
@@ -125,8 +128,12 @@ class DbSync
         );
         $statement->execute();
         $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
+        
         // todo: convert $row['status'] to boolean to save memory
+        if (!isset($this->syncCache[$sourceId])) {
+            $this->syncCache[$sourceId] = [];
+        }
+
         foreach ($rows as $row) {
             $this->syncCache[$sourceId][$row['id']] = $row['status'];
         }

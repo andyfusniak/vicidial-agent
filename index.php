@@ -37,17 +37,17 @@ foreach ($glob as $filepath) {
 
 
 // hard wired for a single source (refactor later)
-$sourceConfig360 = $sourceConfig['360'];
+$sourceConfig = $sourceConfig['dis'];
 
 // Source PDO
 $log->info('Attempting to connect to source db defined by '
-    . $sourceConfig360['name'] . '...');
+    . $sourceConfig['name'] . '...');
 try {
     $sourcePdo = new PDO(
-        'mysql:host=' . $sourceConfig360['db']['dbhost']
-                      . ';dbname=' . $sourceConfig360['db']['dbname'] . ';charset=UTF8',
-        $sourceConfig360['db']['dbuser'],
-        $sourceConfig360['db']['dbpass']
+        'mysql:host=' . $sourceConfig['db']['dbhost']
+                      . ';dbname=' . $sourceConfig['db']['dbname'] . ';charset=UTF8',
+        $sourceConfig['db']['dbuser'],
+        $sourceConfig['db']['dbpass']
     );
     $sourcePdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $log->info('Connection Established');
@@ -56,7 +56,11 @@ try {
 }
 
 //$mock = new Source\MockSourceAdapter();
-$source = new Source\MysqlSourceAdapter($sourcePdo, $sourceConfig360);
+$source = new Source\MysqlSourceAdapter(
+    $sourcePdo,
+    $sourceConfig,
+    $config['vagent']
+);
 $source->setLogger($log);
 
 $apiGateway = new VicidialApiGateway();
@@ -83,7 +87,15 @@ try {
     var_dump($e->getMessage());
 }
 
-$mapper = new Mapper($dbSync, $source, $dest, ['skip_errors' => true]);
+$mapper = new Mapper(
+    $dbSync,
+    $source,
+    $dest,
+    [
+        'skip_errors'  => true,
+        'dry_run_mode' => $config['vagent']['dry_run_mode']
+    ]
+);
 $mapper->setLogger($log);
 $mapper->process();
 
