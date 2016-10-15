@@ -48,12 +48,31 @@ class Mapper implements MapperInterface
                 // default
                 $this->options['skip_errors'] = false;
             }
+
+            if (isset($options['dry_run_mode'])) {
+                $this->options['dry_run_mode'] = $options['dry_run_mode'];
+            } else {
+                $this->options['dry_run_mode'] = false;
+            }
         }
     }
 
     public function process()
     {
-        $dataSourceId = $this->dbSync->getDataSourceIdByName('360');
+        $dataSourceName = $this->sourceAdapter->getName();
+        $dataSourceId = $this->dbSync->getDataSourceIdByName(
+            $dataSourceName
+        );
+        
+        if (null === $dataSourceId) {
+            if ($this->log) {
+                $this->log->debug(sprintf(
+                    'Cannot find sync data row for %s',
+                    $dataSourceName 
+                ));
+            }
+            return;
+        }
 
         $this->dbSync->updateSourceStats(
             $dataSourceId,
@@ -78,19 +97,21 @@ class Mapper implements MapperInterface
                     continue;
                 }
 
-                $result = $this->destAdapater->pushItem($item);
-                if (true === $result) {
-                    $this->dbSync->markDataSync(
-                        $dataSourceId,
-                        $item->getId(),
-                        DbSync::DATA_SYNC_SUCCESS
-                    );
-                } else {
-                    $this->dbSync->markDataSync(
-                        $dataSourceId,
-                        $item->getId(),
-                        DbSync::DATA_SYNC_ERROR
-                    );
+                if (false === $this->options['dry_run_mode']) {
+                    $result = $this->destAdapater->pushItem($item);
+                    if (true === $result) {
+                        $this->dbSync->markDataSync(
+                            $dataSourceId,
+                            $item->getId(),
+                            DbSync::DATA_SYNC_SUCCESS
+                        );
+                    } else {
+                        $this->dbSync->markDataSync(
+                            $dataSourceId,
+                            $item->getId(),
+                            DbSync::DATA_SYNC_ERROR
+                        );
+                    }
                 }
             }
         }

@@ -23,14 +23,40 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     protected $log;
 
     /**
-     * Function constructor
-     * @param \PDO MySQL PDO Object dependency
+     * @var string
      */
-    public function __construct(\PDO $pdo, array $config)
+    protected $name;
+
+    /**
+     * Function constructor
+     *
+     * @param \PDO $pdo MySQL PDO Object dependency
+     * @param array $config the source config for this source
+     * @param array optional parameters to configure this data source
+     */
+    public function __construct(\PDO $pdo, array $config, $options = null)
     {
         $this->pdo = $pdo;
         $this->config = $config;
+
+        if ($options) {
+            if (isset($options['default_page_size'])) {
+                $this->pageSize = (int) $options['default_page_size'];
+            }
+        }
+
+        $this->name = $pdo->query('SELECT DATABASE()')->fetchColumn();
         parent::__construct();
+    }
+
+    /**
+     * Get the name of this data source
+     *
+     * @return string name of this data source
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -210,7 +236,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         $statement = $this->pdo->prepare(
             'SELECT ' . $this->getSelectFieldsSqlString()
             . ' FROM ' . $this->getTableName()
-            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' DESC'
+            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' ASC'
             . ' LIMIT ' . $this->getCursorPosition() . ',1'
         );
         $statement->execute();
@@ -233,12 +259,19 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         $statement = $this->pdo->prepare(
             'SELECT ' . $this->getSelectFieldsSqlString()
             . ' FROM ' . $this->getTableName()
-            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' DESC'
+            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' ASC'
             . ' LIMIT ' . $page . ',' . $this->pageSize
         );
         $statement->execute();
         $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-    
+   
+        if (0 === $statement->rowCount()) {
+            if ($this->log) {
+                $this->log->debug('getNextPage() returning null as no more items to fetch');
+            }
+            return null;
+        }
+
         if ($this->log) {
             $this->log->debug('Fetched page the next ' . $this->pageSize . ' from page ' . $page);
         }    
