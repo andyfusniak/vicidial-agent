@@ -45,7 +45,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
             }
         }
 
-        $this->name = $pdo->query('SELECT DATABASE()')->fetchColumn();
+        $this->name = $config['name'];
         parent::__construct();
     }
 
