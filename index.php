@@ -94,7 +94,7 @@ $mapper = new Mapper(
     $source,
     $dest,
     [
-        'skip_errors'  => true,
+        'skip_errors'  => $config['vagent']['skip_errors'],
         'dry_run_mode' => $config['vagent']['dry_run_mode']
     ]
 );

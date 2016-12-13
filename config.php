@@ -10,7 +10,8 @@ return [
     ],
     'vagent' => [
         'default_page_size' => 50,
-        'dry_run_mode'      => false
+        'dry_run_mode'      => false,
+        'skip_errors'       => false
     ],
     'apigateway' => [
         'timeout' => 10,
