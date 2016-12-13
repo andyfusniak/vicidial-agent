@@ -8,6 +8,7 @@ use Ifp\VAgent\Adapter\Source;
 use Ifp\VAgent\Adapter\Dest\VicidialDestAdapter;
 use Ifp\VAgent\Mapper\Mapper;
 use Ifp\VAgent\Db\DbSync;
+use Ifp\VAgent\Version\Version;
 
 use Ifp\Vicidial\VicidialApiGateway;
 
@@ -20,7 +21,7 @@ chdir(__DIR__);
 // setup the logging
 $log = new Logger('vagent');
 $log->pushHandler(new StreamHandler($config['log_fullpath'], $config['logging_level']));
-$log->info('VAgent Started');
+$log->info('VAgent ' . Version::VERSION . ' Started');
 
 // read each of the config files from the conf.d directory
 // and add each to the source configuration array
@@ -36,8 +37,9 @@ foreach ($glob as $filepath) {
 }
 
 
+// @todo
 // hard wired for a single source (refactor later)
-$sourceConfig = $sourceConfig['dis'];
+$sourceConfig = $sourceConfig['f1_leads'];
 
 // Source PDO
 $log->info('Attempting to connect to source db defined by '
