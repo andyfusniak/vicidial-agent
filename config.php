@@ -9,7 +9,7 @@ return [
         'dbname' => 'vagent'
     ],
     'vagent' => [
-        'default_page_size' => 10,
+        'default_page_size' => 50,
         'dry_run_mode'      => false
     ],
     'apigateway' => [

@@ -32,7 +32,7 @@ return [
         'others'            => 'others'    
     ],
     'static_fields' => [
-        'list_id'       => '7000',
+        'list_id'       => '9001',
         'phone_code'    => '66',        // mandatory field
         'last_name'     => '',          // not used in 360 source
         'custom_fields' => 'Y',
