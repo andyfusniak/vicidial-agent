@@ -6,5 +6,5 @@ final class Version
     /**
       * VAgent version identification
       */
-    const VERSION = '1.1.2';
+    const VERSION = '1.2.0';
 }
