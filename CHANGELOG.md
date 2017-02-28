@@ -1,4 +1,8 @@
 # CHANGELOG
+## 1.1.1 (28 Feb 2017)
+
+- Fix bug with vagent system database not connecting
+
 ## 1.1.0 (28 Feb 2017)
 
 - VAgent program handles multiple source configs one by one
