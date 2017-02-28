@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.3.0 (28 Feb 2017)
+- Process only one page of items per program run
+
 ## 1.2.0 (28 Feb 2017)
 - Daily log rotation to log to ./var/logs directory
 
