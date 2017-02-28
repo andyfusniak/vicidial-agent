@@ -80,38 +80,46 @@ class Mapper implements MapperInterface
             $this->sourceAdapter->getLastRecordId()
         );
 
-        $items = $this->sourceAdapter->getNextPage();
-        foreach ($items as $item) {
-            $status = $this->dbSync->getSyncStatus($dataSourceId, $item->getId());
+        $pagesPushed = 0;
+        while (($pagesPushed < 2) && ($items = $this->sourceAdapter->getNextPage())) {
+            $thisPageHasPushedItems = false;
+            foreach ($items as $item) {
+                $status = $this->dbSync->getSyncStatus($dataSourceId, $item->getId());
 
-            if (DbSync::DATA_SYNC_SUCCESS === $status) {
-                if ($this->log) {
-                    $this->log->debug('Skipping data source as it has already been processed before', [$dataSourceId, $item->getId()]);
+                if (DbSync::DATA_SYNC_SUCCESS === $status) {
+                    if ($this->log) {
+                        $this->log->debug('Skipping data source as it has already been processed before', [$dataSourceId, $item->getId()]);
+                    }
+                    continue;
+                } else if ((DbSync::DATA_SYNC_ERROR === $status)
+                    && (true === $this->options['skip_errors'])) {
+                    if ($this->log) {
+                        $this->log->debug('Skipping data source as it has already before', [$dataSourceId, $item->getId()]);
+                    }
+                    continue;
                 }
-                continue;
-            } else if ((DbSync::DATA_SYNC_ERROR === $status)
-                && (true === $this->options['skip_errors'])) {
-                if ($this->log) {
-                    $this->log->debug('Skipping data source as it has already before', [$dataSourceId, $item->getId()]);
+
+                if (false === $this->options['dry_run_mode']) {
+                    $result = $this->destAdapater->pushItem($item);
+                    if (true === $result) {
+                        $this->dbSync->markDataSync(
+                            $dataSourceId,
+                            $item->getId(),
+                            DbSync::DATA_SYNC_SUCCESS
+                        );
+                    } else {
+                        $this->dbSync->markDataSync(
+                            $dataSourceId,
+                            $item->getId(),
+                            DbSync::DATA_SYNC_ERROR
+                        );
+                    }
+                    $thisPageHasPushedItems = true;
                 }
-                continue;
             }
 
-            if (false === $this->options['dry_run_mode']) {
-                $result = $this->destAdapater->pushItem($item);
-                if (true === $result) {
-                    $this->dbSync->markDataSync(
-                        $dataSourceId,
-                        $item->getId(),
-                        DbSync::DATA_SYNC_SUCCESS
-                    );
-                } else {
-                    $this->dbSync->markDataSync(
-                        $dataSourceId,
-                        $item->getId(),
-                        DbSync::DATA_SYNC_ERROR
-                    );
-                }
+            if (true === $thisPageHasPushedItems) {
+                $pagesPushed++;
             }
         }
     }
