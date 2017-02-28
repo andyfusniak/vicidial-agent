@@ -142,16 +142,16 @@ foreach ($sourceConfig as $source) {
             $source['db']['dbname']
         ));
 
-        $source = new Source\MysqlSourceAdapter(
+        $sourceAdapter = new Source\MysqlSourceAdapter(
             $sourcePdo,
-            $sourceConfig,
+            $source,
             $config['vagent']
         );
-        $source->setLogger($log);
+        $sourceAdapter->setLogger($log);
 
         $mapper = new Mapper(
             $dbSync,
-            $source,
+            $sourceAdapter,
             $dest,
             [
                 'skip_errors'  => $config['vagent']['skip_errors'],
