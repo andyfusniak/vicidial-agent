@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.2.0 (28 Feb 2017)
+- Daily log rotation to log to ./var/logs directory
+
 ## 1.1.2 (28 Feb 2017)
 - Fix vagent source adapter
 
