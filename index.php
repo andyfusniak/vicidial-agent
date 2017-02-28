@@ -127,7 +127,7 @@ foreach ($sourceConfig as $source) {
             'mysql:host=' . $source['db']['dbhost']
                           . ';dbname=' . $source['db']['dbname'] . ';charset=UTF8',
             $source['db']['dbuser'],
-            $source['db']['dbname'],
+            $source['db']['dbpass'],
             [
                 PDO::ATTR_TIMEOUT => 4,
                 PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
