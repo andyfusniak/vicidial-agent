@@ -18,10 +18,11 @@ $config = require_once './config.php';
 chdir(__DIR__);
 
 // setup the logging
+$logFilepath = str_replace('%date_str%', date('Ymd'), $config['log_fullpath']);
 $log = new Logger('vagent');
 $log->pushHandler(
     new StreamHandler(
-        $config['log_fullpath'],
+        $logFilepath,
         $config['logging_level']
     )
 );
