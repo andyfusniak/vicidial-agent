@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.1.2 (28 Feb 2017)
+- Fix vagent source adapter
+
 ## 1.1.1 (28 Feb 2017)
 
 - Fix bug with vagent system database not connecting
