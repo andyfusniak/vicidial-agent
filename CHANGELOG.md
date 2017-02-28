@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.4.0 (28 Feb 2017)
+- Make sure at least one page of actual data is pushed per program run
+
 ## 1.3.0 (28 Feb 2017)
 - Process only one page of items per program run
 
