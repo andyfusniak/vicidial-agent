@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.5.2 (6 Mar 2017)
+- Bugfix 1.5.1 release (see below)
+
 ## 1.5.1 (6 Mar 2017)
 - Change composer.json to pull vicidial-api-gateway direct from bitbucket
 

@@ -1,10 +1,7 @@
 {
-    "autoload": {
-        "Ifp\\": "src/Ifp/"
-    },
     "require": {
         "monolog/monolog": "*",
-        "ifp/vicidial-api-gateway": "^1"
+        "ifp/vicidial-api-gateway": "^1.0.0"
     },
     "repositories": [
         {
@@ -12,6 +9,11 @@
             "url": "git@bitbucket.org:sudtanadevteam/vicidial-api-gateway.git"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Ifp\\VAgent\\": "src/Ifp/VAgent/"
+        }
+    },
     "config": {
         "disable-tls": false
     }
