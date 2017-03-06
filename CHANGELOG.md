@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.5.1 (6 Mar 2017)
+- Change composer.json to pull vicidial-api-gateway direct from bitbucket
+
 ## 1.5.0 (6 Mar 2017)
 - Use port 8080 for VICIdial api gateway connection as 3BB doesn't support port 80.  (requires vicidial-api-gateway 1.1.0)
 
