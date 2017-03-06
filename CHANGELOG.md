@@ -1,4 +1,7 @@
 # CHANGELOG
+## 1.5.0 (6 Mar 2017)
+- Use port 8080 for VICIdial api gateway connection as 3BB doesn't support port 80.  (requires vicidial-api-gateway 1.1.0)
+
 ## 1.4.0 (28 Feb 2017)
 - Make sure at least one page of actual data is pushed per program run
 
