@@ -104,7 +104,8 @@ $apiGateway = new VicidialApiGateway();
 $apiGateway->setConnectionTimeoutSeconds($config['apigateway']['timeout'])
            ->setHost($config['apigateway']['host'])
            ->setUser($config['apigateway']['user'])
-           ->setPass($config['apigateway']['pass']);
+           ->setPass($config['apigateway']['pass'])
+           ->setPort($config['apigateway']['port']);
 $log->info(sprintf(
     'Created VicidialApiGateway (host="%s", user="%s")',
     $config['apigateway']['host'],
