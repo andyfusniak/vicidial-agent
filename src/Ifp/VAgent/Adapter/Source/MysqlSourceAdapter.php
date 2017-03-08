@@ -82,7 +82,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     private function getSelectFieldsSqlString()
     {
         $list = array_keys($this->config['select_field_mappings']);
-        
+
         // always include the primary key as the first element
         // in the select list
         array_unshift($list, $this->getPrimaryKeyFieldName());
@@ -141,7 +141,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
         return (int) $row['next_record_id'] - 1;
     }
-    
+
     /**
      * @return int current cursor position in the list
      */
@@ -221,7 +221,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
 
         // the rest of the $dest are custom
         $item->setCustomParams($dest);
-        
+
         return $item;
     }
 
@@ -248,6 +248,39 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     }
 
     /**
+     * Checks the information_schema to see if the is_dups
+     * column is in use
+     *
+     * @return bool true if the is_dups column is in use
+     */
+    public function hasIsDupsColumn()
+    {
+        $statement = $this->pdo->prepare('
+            SELECT COUNT(*) AS cnt
+            FROM information_schema.COLUMNS
+            WHERE
+                TABLE_SCHEMA = DATABASE() AND
+                TABLE_NAME = :table_name AND
+                COLUMN_NAME = "is_dup"
+        ');
+        $statement->bindValue(
+            ':table_name',
+            $this->getTableName(),
+            \PDO::PARAM_STR
+        );
+        $statement->execute();
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        $cnt = (int) $row['cnt'];
+
+        if ($cnt > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get the next page of Item objects as a ItemCollection
      *
      * @return ItemCollection
@@ -256,15 +289,18 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     {
         $page = ($this->page * $this->pageSize);
 
-        $statement = $this->pdo->prepare(
-            'SELECT ' . $this->getSelectFieldsSqlString()
-            . ' FROM ' . $this->getTableName()
-            . ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' ASC'
-            . ' LIMIT ' . $page . ',' . $this->pageSize
-        );
+        $sql = 'SELECT ' . $this->getSelectFieldsSqlString()
+             . ' FROM ' . $this->getTableName();
+        if (true === $this->hasIsDupsColumn()) {
+            $sql .= ' WHERE is_dup = 0';
+        }
+        $sql .= ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' ASC'
+             . ' LIMIT ' . $page . ',' . $this->pageSize;
+
+        $statement = $this->pdo->prepare($sql);
         $statement->execute();
         $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-   
+
         if (0 === $statement->rowCount()) {
             if ($this->log) {
                 $this->log->debug('getNextPage() returning null as no more items to fetch');
@@ -274,7 +310,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
 
         if ($this->log) {
             $this->log->debug('Fetched page the next ' . $this->pageSize . ' from page ' . $page);
-        }    
+        }
 
         $itemCollection = new ItemCollection();
         foreach ($rows as $row) {
