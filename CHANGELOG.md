@@ -1,5 +1,8 @@
 # CHANGELOG
-## 1.6.0 (8 Mar 2017)\
+## 1.6.1 (8 Mar 2017)
+- Fix db filter for case where both is_dup and date_added are used together.  Broken in 1.6.0
+
+## 1.6.0 (8 Mar 2017)
 - Ignore flagged duplicated using the optional is_dup column
 - Db Filter to filter lists on date_added
 
