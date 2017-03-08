@@ -28,6 +28,11 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $filter;
+
+    /**
      * @var bool
      */
     protected $hasIsDupColumn = null;
@@ -51,6 +56,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         }
 
         $this->name = $config['name'];
+        $this->filter = isset($config['filter']) ? $config['filter'] : null;
         parent::__construct();
     }
 
@@ -299,11 +305,25 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     {
         $page = ($this->page * $this->pageSize);
 
+        $where = [];
+        if (true === $this->hasIsDupColumn()) {
+            $where[] = 'is_dup = 0';
+        }
+
+        if (null !== $this->filter) {
+            $where[] = $this->filter;
+        }
+
+        $first = true;
+        $whereClause = '';
+        foreach ($where as $item) {
+            $whereClause .= ((true === $first) ? ' WHERE ' : ' AND ')
+                         . $item;
+        }
+
         $sql = 'SELECT ' . $this->getSelectFieldsSqlString()
              . ' FROM ' . $this->getTableName();
-        if (true === $this->hasIsDupColumn()) {
-            $sql .= ' WHERE is_dup = 0';
-        }
+        $sql .= $whereClause;
         $sql .= ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' ASC'
              . ' LIMIT ' . $page . ',' . $this->pageSize;
 
