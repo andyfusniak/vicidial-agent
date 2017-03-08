@@ -316,9 +316,15 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
 
         $first = true;
         $whereClause = '';
+        $delimiter = ' WHERE ';
         foreach ($where as $item) {
-            $whereClause .= ((true === $first) ? ' WHERE ' : ' AND ')
-                         . $item;
+            if (true === $first) {
+                $delimiter = ' WHERE ';
+                $first = false;
+            } else {
+                $delimiter = ' AND ';
+            }
+            $whereClause .= $delimiter . $item;
         }
 
         $sql = 'SELECT ' . $this->getSelectFieldsSqlString()
