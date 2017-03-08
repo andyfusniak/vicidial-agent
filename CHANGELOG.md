@@ -1,4 +1,8 @@
 # CHANGELOG
+## 1.6.0 (8 Mar 2017)\
+- Ignore flagged duplicated using the optional is_dup column
+- Db Filter to filter lists on date_added
+
 ## 1.5.2 (6 Mar 2017)
 - Bugfix 1.5.1 release (see below)
 
