@@ -21,6 +21,6 @@ return [
         'port'    => '8080'
     ],
     'config_data_dir' => './conf.d',
-    'log_fullpath'    => './var/logs/%date_str%-vagent.log',
+    'log_fullpath'    => './var/logs/%date_str%_vagent.log',
     'logging_level'   => Logger::DEBUG,
 ];
