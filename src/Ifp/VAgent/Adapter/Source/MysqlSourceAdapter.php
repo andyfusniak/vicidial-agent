@@ -28,6 +28,11 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
     protected $name;
 
     /**
+     * @var bool
+     */
+    protected $hasIsDupColumn = null;
+
+    /**
      * Function constructor
      *
      * @param \PDO $pdo MySQL PDO Object dependency
@@ -253,8 +258,13 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
      *
      * @return bool true if the is_dups column is in use
      */
-    public function hasIsDupsColumn()
+    public function hasIsDupColumn()
     {
+        // cache the value so it happens only once
+        if (null !== $this->hasIsDupColumn) {
+            return $this->hasIsDupColumn;
+        }
+
         $statement = $this->pdo->prepare('
             SELECT COUNT(*) AS cnt
             FROM information_schema.COLUMNS
@@ -274,10 +284,10 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
         $cnt = (int) $row['cnt'];
 
         if ($cnt > 0) {
-            return true;
+            return $this->hasIsDupColumn = true;
         }
 
-        return false;
+        return $this->hasIsDupColumn = false;
     }
 
     /**
@@ -291,7 +301,7 @@ class MysqlSourceAdapter extends SourceAdapterAbstract implements SourceAdapterI
 
         $sql = 'SELECT ' . $this->getSelectFieldsSqlString()
              . ' FROM ' . $this->getTableName();
-        if (true === $this->hasIsDupsColumn()) {
+        if (true === $this->hasIsDupColumn()) {
             $sql .= ' WHERE is_dup = 0';
         }
         $sql .= ' ORDER BY ' . $this->getPrimaryKeyFieldName() . ' ASC'
