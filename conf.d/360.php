@@ -4,10 +4,10 @@ use Ifp\VAgent\Vicidial\VicidialApiGateway;
 return [
     'name' => '360',
     'db' => [
-        'dbhost' => '27.254.36.66',
-        'dbuser' => '360user',
-        'dbpass' => 'Pe2n!*8f',
-        'dbname' => 'gt360'
+        'dbhost' => '',
+        'dbuser' => '',
+        'dbpass' => '',
+        'dbname' => ''
     ],
     'table_name' => 'users',
     'primary_key_field_name' => 'id',
