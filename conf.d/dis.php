@@ -4,10 +4,10 @@ use Ifp\VAgent\Vicidial\VicidialApiGateway;
 return [
     'name' => 'dis',
     'db' => [
-        'dbhost' => 'goldfish.cjk7c0oly6sf.ap-southeast-1.rds.amazonaws.com',
-        'dbuser' => 'dis',
-        'dbpass' => 'AXW6L42UXXNhb49a',
-        'dbname' => 'dis'
+        'dbhost' => '',
+        'dbuser' => '',
+        'dbpass' => '',
+        'dbname' => ''
     ],
     'table_name' => 'users',
     'primary_key_field_name' => 'id',
